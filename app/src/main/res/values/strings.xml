@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Hello Kitty Quiz</string>
+    <string name="question1">Hello Kitty Boyfriend is called Dear Daniel</string>
+    <string name="true_string">TRUE</string>
+    <string name="false_string">FALSE</string>
+    <string name="correct_string"> THIS IS CORRECT!</string>
+    <string name="incorrect_string"> THIS IS INCORRECT!</string>
+    <string name="next_button"> NEXT</string>
+    <string name="question2">Hello Kitty is not an UNICEF ambassador</string>
+    <string name="question3">Hello Kitty Twin sister is named Nini</string>
+    <string name="question4">Hello Kitty full name is Kitty Black</string>
+    <string name="question5">Hello Kitty lives in London</string>
+    <string name="show_answer_button"> Show me the Answer</string>
+    <string name="cheat_button"> CLICK HERE TO CHEAT</string>
+
+
+</resources>
