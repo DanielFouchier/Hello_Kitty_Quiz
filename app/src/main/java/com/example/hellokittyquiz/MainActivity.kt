@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -13,11 +14,13 @@ import androidx.lifecycle.ViewModel
 import com.example.hellokittyquiz.databinding.ActivityMainBinding
 
 private const val TAG = "MainActivity";
-
+var score = 0
 
 private lateinit var true_button:Button
 private lateinit var false_button: Button
 var cheatArray = BooleanArray(QuizViewModel().questionBank.size)
+var answeredArray = BooleanArray(QuizViewModel().questionBank.size)
+var questionsanswered = 0
 var index = 0
 
 fun main() {
@@ -80,11 +83,19 @@ class MainActivity : AppCompatActivity() {
         // this will get you the id for the current question in the question bank
         updateQuestion()
 
+        val stringScore = "Current Score is $score out of $questionsanswered"
+        binding.scoreTextView.setText(stringScore)
+
     }
 
     override fun onStart() {
         super.onStart()
         Log.d(TAG, "onStart() is called")
+    }
+
+    private fun updateScore(){
+        val stringScore = "Current Score is $score out of $questionsanswered"
+        binding.scoreTextView.setText(stringScore)
     }
 
     override fun onResume() {
@@ -116,6 +127,7 @@ class MainActivity : AppCompatActivity() {
         binding.questionTextView.setText(questionTextResId)
     }
 
+
     private fun checkAnswer(userAnswer:Boolean){
         if (cheatArray[index]){
             Toast.makeText(this, "YOU CHEATED!", Toast.LENGTH_SHORT).show()
@@ -123,12 +135,35 @@ class MainActivity : AppCompatActivity() {
         else {
             val correctAnswer = quizViewModel.currentQuestionAnswer
             val messageResId = if (userAnswer == correctAnswer) {
-                R.string.correct_string
-            } else {
-                R.string.incorrect_string
+                if (!answeredArray[index]) {
+                    score += 1
+                    questionsanswered += 1
+                    updateScore()
+
+                    answeredArray[index] = true
+
+                    R.string.correct_string
+                }
+                else{
+                    R.string.correct_string
+                }
+            }
+            else {
+                if (!answeredArray[index]) {
+                    questionsanswered += 1
+                    updateScore()
+
+                    R.string.incorrect_string
+                }
+                else{
+                    R.string.incorrect_string
+                }
             }
             Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
         }
     }
+
+
+
 }
 
