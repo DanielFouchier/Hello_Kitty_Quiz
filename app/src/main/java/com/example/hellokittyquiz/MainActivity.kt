@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
     private val cheatLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) {
-        result ->
+            result ->
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -93,26 +93,34 @@ class MainActivity : AppCompatActivity() {
         val timertext = ("seconds remaining: " + 20000 / 1000)
         binding.timerTextView.setText(timertext)
 
-}
+
+    }
 
 
-        object Timer : CountDownTimer(20000, 1000) {
+
+
+
+
+
+
+    private fun beginTimer() {
+        val timer = object : CountDownTimer(30000, 1000) {
+
+            // Callback function, fired on regular interval
             override fun onTick(millisUntilFinished: Long) {
-                val timertext = ("seconds remaining: " + millisUntilFinished / 1000)
+                binding.timerTextView.setText("seconds remaining: " + millisUntilFinished / 1000)
             }
+
+            // Callback function, fired
+            // when the time is up
             override fun onFinish() {
-                val timertext = "done"
+                binding.timerTextView.setText("done!")
             }
-        }
+        }.start()
+    }
 
 
-
-
-
-
-
-
-override fun onStart() {
+    override fun onStart() {
         super.onStart()
         Log.d(TAG, "onStart() is called")
     }
@@ -145,10 +153,13 @@ override fun onStart() {
     private fun updateQuestion(){
         //val questionTextResId = questionBank[currentIndex].textResId
         index = (index + 1) % QuizViewModel().questionBank.size
-  //      Log.d(TAG,"conditional breakpoint", Exception())
+        //      Log.d(TAG,"conditional breakpoint", Exception())
 
         val questionTextResId = quizViewModel.currentQuestionText
         binding.questionTextView.setText(questionTextResId)
+
+        beginTimer()
+
     }
 
 
@@ -202,4 +213,3 @@ override fun onStart() {
 
 
 }
-
