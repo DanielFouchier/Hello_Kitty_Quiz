@@ -3,6 +3,7 @@ package com.example.hellokittyquiz
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.util.Log
 import android.view.View
 import android.widget.Button
@@ -89,10 +90,29 @@ class MainActivity : AppCompatActivity() {
 
         val stringScore = "Current Score is $score out of $questionsanswered"
         binding.scoreTextView.setText(stringScore)
+        val timertext = ("seconds remaining: " + 20000 / 1000)
+        binding.timerTextView.setText(timertext)
 
-    }
+}
 
-    override fun onStart() {
+
+        object Timer : CountDownTimer(20000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                val timertext = ("seconds remaining: " + millisUntilFinished / 1000)
+            }
+            override fun onFinish() {
+                val timertext = "done"
+            }
+        }
+
+
+
+
+
+
+
+
+override fun onStart() {
         super.onStart()
         Log.d(TAG, "onStart() is called")
     }
