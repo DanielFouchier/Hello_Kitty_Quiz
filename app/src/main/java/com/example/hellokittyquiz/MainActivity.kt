@@ -14,12 +14,16 @@ import androidx.lifecycle.ViewModel
 import com.example.hellokittyquiz.databinding.ActivityMainBinding
 
 private const val TAG = "MainActivity";
+//initialize player score to 0
 var score = 0
 
 private lateinit var true_button:Button
 private lateinit var false_button: Button
+//initialize arrays to size of questionBank to keep track of indicies where question was cheated on and/or already answered
 var cheatArray = BooleanArray(QuizViewModel().questionBank.size)
 var answeredArray = BooleanArray(QuizViewModel().questionBank.size)
+
+//variables to track number of questions answered and index
 var questionsanswered = 0
 var index = 0
 
@@ -130,12 +134,22 @@ class MainActivity : AppCompatActivity() {
 
     private fun checkAnswer(userAnswer:Boolean){
         if (cheatArray[index]){
-            Toast.makeText(this, "YOU CHEATED!", Toast.LENGTH_SHORT).show()
+            //if cheated, check if already answered, if not update score and mark as answered
+            Toast.makeText(this, R.string.cheated_string, Toast.LENGTH_SHORT).show()
+            if (!answeredArray[index]){
+                questionsanswered += 1
+                updateScore()
+                answeredArray[index] = true
+            }
+
+
         }
         else {
             val correctAnswer = quizViewModel.currentQuestionAnswer
+
             val messageResId = if (userAnswer == correctAnswer) {
                 if (!answeredArray[index]) {
+                    //if not an answered question, update score, and mark as answered
                     score += 1
                     questionsanswered += 1
                     updateScore()
@@ -149,9 +163,11 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             else {
+                //if not an answered question, update score, and mark as answered
                 if (!answeredArray[index]) {
                     questionsanswered += 1
                     updateScore()
+                    answeredArray[index] = true
 
                     R.string.incorrect_string
                 }
