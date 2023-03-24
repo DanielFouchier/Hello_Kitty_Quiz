@@ -24,6 +24,9 @@ private lateinit var false_button: Button
 var cheatArray = BooleanArray(QuizViewModel().questionBank.size)
 var answeredArray = BooleanArray(QuizViewModel().questionBank.size)
 
+//keep track if index has a timer begun
+var timerArray = BooleanArray(QuizViewModel().questionBank.size)
+
 //variables to track number of questions answered and index
 var questionsanswered = 0
 var index = 0
@@ -61,10 +64,14 @@ class MainActivity : AppCompatActivity() {
             // Do something if you click on true button
             // have a correct toast that pops up
 
+            //if button click, turn timerArray at index to false so user can go to next problem
+            timerArray[index] = false
             checkAnswer(true)
         }
 
         binding.falseButton.setOnClickListener { view: View ->
+            //if button click, turn timerArray at index to false so user can go to next problem
+            timerArray[index] = false
             checkAnswer(false)
         }
 
@@ -81,8 +88,14 @@ class MainActivity : AppCompatActivity() {
         // ie what happen if you press the next button
         binding.nextButton.setOnClickListener {
             //currentIndex = (currentIndex + 1)%questionBank.size
-            quizViewModel.moveToNext()
-            updateQuestion()
+
+            //check if timer has begun for question, if it has wait until question is answered or timer finishes before
+            // allowing user to go to next question
+            if (!timerArray[index]){
+                quizViewModel.moveToNext()
+                updateQuestion()
+            }
+
         }
 
         // this will get you the id for the current question in the question bank
@@ -104,6 +117,8 @@ class MainActivity : AppCompatActivity() {
 
 
     public fun beginTimer() {
+        //add in current index showing question has a timer begun
+        timerArray[index] = true
         timer = object : CountDownTimer(30000, 1000) {
 
             // Callback function, fired on regular interval
@@ -115,7 +130,17 @@ class MainActivity : AppCompatActivity() {
             // when the time is up
             override fun onFinish() {
                 binding.timerTextView.setText("Time is up, question no longer will be counted as correct!")
-                answeredArray[index] = true
+
+                //set answeredArray to true, increment questions answered, at set timerArray to false so user can go to next question.
+                if (!answeredArray[index]){
+                    answeredArray[index] = true
+
+                    questionsanswered = questionsanswered + 1
+                }
+
+                updateScore()
+                //set timerArray at index to false so user can go to next question
+                timerArray[index] = false
             }
         }.start()
     }
@@ -164,6 +189,7 @@ class MainActivity : AppCompatActivity() {
         binding.questionTextView.setText(questionTextResId)
         stopTimer()
         beginTimer()
+
 
     }
 
