@@ -36,7 +36,7 @@ fun main() {
 
 class MainActivity : AppCompatActivity() {
 
-
+    private var timer: CountDownTimer? = null
     private lateinit var binding: ActivityMainBinding
     private val quizViewModel: QuizViewModel by viewModels()
     private val cheatLauncher = registerForActivityResult(
@@ -103,8 +103,8 @@ class MainActivity : AppCompatActivity() {
 
 
 
-    private fun beginTimer() {
-        val timer = object : CountDownTimer(30000, 1000) {
+    public fun beginTimer() {
+        timer = object : CountDownTimer(30000, 1000) {
 
             // Callback function, fired on regular interval
             override fun onTick(millisUntilFinished: Long) {
@@ -114,10 +114,15 @@ class MainActivity : AppCompatActivity() {
             // Callback function, fired
             // when the time is up
             override fun onFinish() {
-                binding.timerTextView.setText("done!")
+                binding.timerTextView.setText("Time is up, question no longer will be counted as correct!")
+                answeredArray[index] = true
             }
         }.start()
     }
+    public fun stopTimer(){
+        timer?.cancel()
+    }
+
 
 
     override fun onStart() {
@@ -157,7 +162,7 @@ class MainActivity : AppCompatActivity() {
 
         val questionTextResId = quizViewModel.currentQuestionText
         binding.questionTextView.setText(questionTextResId)
-
+        stopTimer()
         beginTimer()
 
     }
