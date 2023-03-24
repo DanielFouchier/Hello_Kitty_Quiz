@@ -3,9 +3,11 @@ package com.example.hellokittyquiz
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -13,11 +15,17 @@ import androidx.lifecycle.ViewModel
 import com.example.hellokittyquiz.databinding.ActivityMainBinding
 
 private const val TAG = "MainActivity";
-
+//initialize player score to 0
+var score = 0
 
 private lateinit var true_button:Button
 private lateinit var false_button: Button
+//initialize arrays to size of questionBank to keep track of indicies where question was cheated on and/or already answered
 var cheatArray = BooleanArray(QuizViewModel().questionBank.size)
+var answeredArray = BooleanArray(QuizViewModel().questionBank.size)
+
+//variables to track number of questions answered and index
+var questionsanswered = 0
 var index = 0
 
 fun main() {
@@ -28,13 +36,13 @@ fun main() {
 
 class MainActivity : AppCompatActivity() {
 
-
+    private var timer: CountDownTimer? = null
     private lateinit var binding: ActivityMainBinding
     private val quizViewModel: QuizViewModel by viewModels()
     private val cheatLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) {
-        result ->
+            result ->
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,11 +88,51 @@ class MainActivity : AppCompatActivity() {
         // this will get you the id for the current question in the question bank
         updateQuestion()
 
+        val stringScore = "Current Score is $score out of $questionsanswered"
+        binding.scoreTextView.setText(stringScore)
+        val timertext = ("seconds remaining: " + 20000 / 1000)
+        binding.timerTextView.setText(timertext)
+
+
     }
+
+
+
+
+
+
+
+
+    public fun beginTimer() {
+        timer = object : CountDownTimer(30000, 1000) {
+
+            // Callback function, fired on regular interval
+            override fun onTick(millisUntilFinished: Long) {
+                binding.timerTextView.setText("seconds remaining: " + millisUntilFinished / 1000)
+            }
+
+            // Callback function, fired
+            // when the time is up
+            override fun onFinish() {
+                binding.timerTextView.setText("Time is up, question no longer will be counted as correct!")
+                answeredArray[index] = true
+            }
+        }.start()
+    }
+    public fun stopTimer(){
+        timer?.cancel()
+    }
+
+
 
     override fun onStart() {
         super.onStart()
         Log.d(TAG, "onStart() is called")
+    }
+
+    private fun updateScore(){
+        val stringScore = "Current Score is $score out of $questionsanswered"
+        binding.scoreTextView.setText(stringScore)
     }
 
     override fun onResume() {
@@ -110,25 +158,63 @@ class MainActivity : AppCompatActivity() {
     private fun updateQuestion(){
         //val questionTextResId = questionBank[currentIndex].textResId
         index = (index + 1) % QuizViewModel().questionBank.size
-  //      Log.d(TAG,"conditional breakpoint", Exception())
+        //      Log.d(TAG,"conditional breakpoint", Exception())
 
         val questionTextResId = quizViewModel.currentQuestionText
         binding.questionTextView.setText(questionTextResId)
+        stopTimer()
+        beginTimer()
+
     }
+
 
     private fun checkAnswer(userAnswer:Boolean){
         if (cheatArray[index]){
-            Toast.makeText(this, "YOU CHEATED!", Toast.LENGTH_SHORT).show()
+            //if cheated, check if already answered, if not update score and mark as answered
+            Toast.makeText(this, R.string.cheated_string, Toast.LENGTH_SHORT).show()
+            if (!answeredArray[index]){
+                questionsanswered += 1
+                updateScore()
+                answeredArray[index] = true
+            }
+
+
         }
         else {
             val correctAnswer = quizViewModel.currentQuestionAnswer
+
             val messageResId = if (userAnswer == correctAnswer) {
-                R.string.correct_string
-            } else {
-                R.string.incorrect_string
+                if (!answeredArray[index]) {
+                    //if not an answered question, update score, and mark as answered
+                    score += 1
+                    questionsanswered += 1
+                    updateScore()
+
+                    answeredArray[index] = true
+
+                    R.string.correct_string
+                }
+                else{
+                    R.string.correct_string
+                }
+            }
+            else {
+                //if not an answered question, update score, and mark as answered
+                if (!answeredArray[index]) {
+                    questionsanswered += 1
+                    updateScore()
+                    answeredArray[index] = true
+
+                    R.string.incorrect_string
+                }
+                else{
+                    R.string.incorrect_string
+                }
             }
             Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
         }
     }
-}
 
+
+
+}

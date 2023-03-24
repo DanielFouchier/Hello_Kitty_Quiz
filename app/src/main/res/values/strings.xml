@@ -12,6 +12,13 @@
     <string name="question5">Hello Kitty lives in London</string>
     <string name="show_answer_button"> Show me the Answer</string>
     <string name="cheat_button"> CLICK HERE TO CHEAT</string>
+    <string name="Current_Score">%s</string>
+    <string name="cheated_string">You Cheated!</string>
+    <string name="Timer">%timer</string>
+
+
+
 
 
 </resources>
+
